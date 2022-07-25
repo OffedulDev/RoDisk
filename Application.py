@@ -23,6 +23,7 @@ class Error(Response):
 
 
 # Utility
+Valid_Tokens = []
 def generatore_random_token():
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
 
@@ -41,6 +42,35 @@ def set_json_key(key, value):
 API = Flask(__name__)
 
 # Flask Routes
+@API.route("/getkey")
+def get_key():
+    Token = request.args.get("token")
+    Key = request.args.get("key")
+    if Token in Valid_Tokens:
+        if Key in get_json_data():
+            return Response("Success", data={
+                "content": get_json_data()[Key]
+            }).__repr__()
+        else:
+            return Error("Key not found").__repr__()
+    else:
+        return Error("Invalid Token").__repr__()
+
+@API.route("/setkey")
+def set_key():
+    token = request.args.get("token")
+    key = request.args.get("key")
+    data = request.args.get("data")
+    
+    if token in Valid_Tokens:
+        set_json_key(key, data)
+        return Response("Sucess", data={
+            "details": "Successfully set key: " + key + " to: " + data}
+        ).__repr__()
+    else:
+        return Error("Invalid Token").__repr__()
+
+
 @API.route('/token')
 def index():
     Passphrase = request.args.get('passphrase')
@@ -53,6 +83,8 @@ def index():
         _Response = Response(message="Token Generated", data={
             "token": generatore_random_token()
         })
+
+        Valid_Tokens.append(_Response.data["token"])
         return _Response.__repr__()
     else:
         _Error = Error("Passphrase is incorrect")
