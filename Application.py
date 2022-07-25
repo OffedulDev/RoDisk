@@ -1,5 +1,7 @@
 from flask import request, redirect, Flask
 import json
+import random
+import string
 
 # Classes
 class Response:
@@ -8,6 +10,7 @@ class Response:
         if data is None:
             self.error = True
         else:
+            self.data = data
             self.error = False
 
     def __repr__(self):
@@ -17,6 +20,11 @@ class Error(Response):
     def __init__(self, message):
         super().__init__(message)
 
+
+
+# Utility
+def generatore_random_token():
+    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
 
 # JSON Actions
 def get_json_data():
@@ -38,6 +46,16 @@ def index():
     Passphrase = request.args.get('passphrase')
     if Passphrase == "" or Passphrase is None:
         _Error = Error("Passphrase is empty")
+        return _Error.__repr__()
+
+    Data = get_json_data()
+    if Data["passphrase"] == Passphrase:
+        _Response = Response(message="Token Generated", data={
+            "token": generatore_random_token()
+        })
+        return _Response.__repr__()
+    else:
+        _Error = Error("Passphrase is incorrect")
         return _Error.__repr__()
 
 
