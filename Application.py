@@ -2,6 +2,10 @@ from flask import request, redirect, Flask
 import json
 import random
 import string
+import threading
+import time
+
+from idna import valid_contextj
 
 # Classes
 class Response:
@@ -20,12 +24,30 @@ class Error(Response):
     def __init__(self, message):
         super().__init__(message)
 
+class Token:
+    def __init__(self, token):
+        self.token = token
+        Valid_Tokens.append(self.token)
+        self.internal_thread = threading.Thread(target=self.invalidate_token)
+        self.internal_thread.start()
+
+    def invalidate_token(self):
+        time.sleep(160) # May have to change this, different tokens cold  have different invalidation times.
+        Valid_Tokens.pop(Valid_Tokens.index(self.token))
+        self.token = None
+        
+        del self
+
+    def __repr__(self):
+        return self.token
 
 
 # Utility
 Valid_Tokens = []
 def generatore_random_token():
-    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
+    _TT = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
+    _TC = Token(_TT)
+    return _TC
 
 # JSON Actions
 def get_json_data():
@@ -79,9 +101,9 @@ def index():
         return _Error.__repr__()
 
     Data = get_json_data()
-    if Data["passphrase"] == Passphrase:
+    if Data["passphrase"] == Passphrase: # may have to improve security at this point.
         _Response = Response(message="Token Generated", data={
-            "token": generatore_random_token()
+            "token": generatore_random_token().__repr__()
         })
 
         Valid_Tokens.append(_Response.data["token"])
