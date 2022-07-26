@@ -114,6 +114,12 @@ def index():
 
 
 # Flask Run
-if __name__ == '__main__':
-    API.run(debug=True)
+def run_api():
+    API.run(host="localhost", port=8080)
+
+def stop_api():
+    API.stop()
+
+# Init
+init = run_api
     
