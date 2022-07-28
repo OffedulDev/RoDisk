@@ -5,8 +5,6 @@ import string
 import threading
 import time
 
-from idna import valid_contextj
-
 # Classes
 class Response:
     def __init__(self, message, data=None):
@@ -122,4 +120,5 @@ def stop_api():
 
 # Init
 init = run_api
+init()
     
