@@ -4,7 +4,7 @@ import json
 Route = "localhost:8080"
 
 # Client Initialization
-token = open("env.private").read()
+token = open("private.env").read()
 Bot = interactions.Client(token=token)
 
 # Client Run
@@ -31,6 +31,7 @@ async def check(ctx, key):
     if Token != None:
         Chace = Token.json()["data"]["token"]
         await ctx.send("Token generated: " + Chace, ephemeral=True)
+    
     return
 
 if __name__ == "__main__":
