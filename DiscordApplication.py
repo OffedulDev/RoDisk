@@ -7,11 +7,6 @@ Route = "localhost:8080"
 token = open("private.env").read()
 Bot = interactions.Client(token=token)
 
-# Client Run
-def init():
-  global Chace
-  Bot.start()
-
 # Client Commands
 @Bot.command(
     name="check",
@@ -30,9 +25,12 @@ async def check(ctx, key):
     Token = requests.get("http://" + Route + "/token?passphrase=" + json.loads(open("Data.json", "r+").read())["passphrase"])
     if Token != None:
         Chace = Token.json()["data"]["token"]
-        await ctx.send("Token generated: " + Chace, ephemeral=True)
-    
+        if Chace != None and len(Chace["data"]) > 0:
+            await ctx.send(Chace["data"]["token"])    
     return
+
+def init():
+  Bot.start()
 
 if __name__ == "__main__":
   init()
